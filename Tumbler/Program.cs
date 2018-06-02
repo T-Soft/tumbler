@@ -70,7 +70,7 @@ namespace Tumbler
 					c = Console.ReadKey();
 				}
 
-				var deadProcesses = watchedProcesses.Where(p=>p.IsBeingWatched).Where(p => !p.IsAlive()).ToList();
+				var deadProcesses = watchedProcesses.Where(p => p.IsBeingWatched && !p.IsAlive).ToList();
 
 				if (deadProcesses.Any())
 				{

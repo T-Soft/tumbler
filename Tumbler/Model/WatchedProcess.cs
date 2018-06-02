@@ -7,43 +7,54 @@ namespace Tumbler.Model
 {
 	public sealed class WatchedProcess
 	{
+		#region Private
+
+		private Process _processObject;
+		private readonly Action<string> _reportProcessStatus;
+		
+		#endregion
+
 		#region Props
 
 		public string ProcessName { private set; get; }
 		public int ProcessId { private set; get; }
 		
-		public ProcessPriorityClass ProcessPriority { private set; get; } = ProcessPriorityClass.High;
+		public ProcessPriorityClass ProcessPriority { get; }
 		public string CommandLine { get; }
 		public int StartTime { get; }
 		public int EndTime { get; }
-
-		public bool IsBeingWatched => EndTime != -1;
-
+		
 		public string ExePath => GetExePath();
 		public string Arguments => GetArguments();
 
 		public bool IsStartedSuccessfully { private set; get; }
-
 		public bool IsStoppedSuccessfully { private set; get; }
-		
-		private Process _processObject;
-		private readonly Action<string> _reportProcessStatus;
+
+		public bool IsBeingWatched => EndTime != -1;
+		public bool IsAlive =>
+			_processObject != null
+			&& (
+				!_processObject.HasExited
+				||
+				ProcessHelper.IsProcessAlive(ProcessId)
+			);
 
 		#endregion
 
 		#region Ctor
 
-		public WatchedProcess(string commandLine, int startTime, int endTime, Action<string> reportProcessStatus)
+		public WatchedProcess(string commandLine, int startTime, int endTime, Action<string> reportProcessStatus, ProcessPriorityClass priority = ProcessPriorityClass.High)
 		{
 			CommandLine = commandLine;
 			StartTime = startTime;
 			EndTime = endTime;
 			_reportProcessStatus = reportProcessStatus;
+			ProcessPriority = priority;
 		}
 
 		#endregion
 
-		#region Methods
+		#region Start / stop methods
 
 		public void Start()
 		{
@@ -107,22 +118,8 @@ namespace Tumbler.Model
 			ProcessName = string.Empty;
 		}
 
-		public bool IsAlive() =>
-			_processObject != null
-			&& (
-				!_processObject.HasExited
-				||
-				ProcessHelper.IsProcessAlive(ProcessId)
-			);
-		
-		
-		public void SetProcessPriority(ProcessPriorityClass newPriority)
-		{
-			ProcessPriority = newPriority;
-		}
-
 		#endregion
-
+		
 		#region Service methods
 
 		private string GetExePath()
