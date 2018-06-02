@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace Tumbler.ConfigurationParsing
+namespace Tumbler.Helpers
 {
 	public static class ProcessHelper
 	{

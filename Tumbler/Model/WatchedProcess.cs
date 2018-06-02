@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using Tumbler.ConfigurationParsing;
+using Tumbler.Helpers;
 
 namespace Tumbler.Model
 {

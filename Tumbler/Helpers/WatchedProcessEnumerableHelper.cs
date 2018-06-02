@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Tumbler.Model;
 
-namespace Tumbler.ConfigurationParsing
+namespace Tumbler.Helpers
 {
 	public static class WatchedProcessEnumerableHelper
 	{
