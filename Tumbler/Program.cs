@@ -4,11 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading;
 using Tumbler.Helpers;
 using Tumbler.ConfigurationParsing;
-using Tumbler.Model;
 
 [assembly: AssemblyVersion("1.0.*")]
 namespace Tumbler
@@ -56,7 +54,11 @@ namespace Tumbler
 			
 			// start all processes
 			watchedProcesses.ForEach(p=>p.Start());
-			
+			if (watchedProcesses.Any(p => !p.IsStartedSuccessfully))
+			{
+				return;
+			}
+
 			Console.WriteLine($"{Environment.NewLine}To keep processes and exit press 'CTRL+C';{Environment.NewLine}"
 				+ $"To close all processes and exit press 'ESC'.{Environment.NewLine}");
 
