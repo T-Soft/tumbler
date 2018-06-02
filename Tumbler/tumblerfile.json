@@ -1,0 +1,18 @@
+﻿{
+	"processes": [
+		{
+			"name": "first program",
+			"priority": "high",
+			"command": "test.bat -n",
+			"start_time": 10,
+			"end_time": 20
+		},
+		{
+			"name": "second program",
+			"priority": "low",
+			"command": "test2.bat -n",
+			"start_time": 20,
+			"end_time": 30
+		}
+	]
+}
