@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Tumbler.ConfigurationParsing;
 using Tumbler.Helpers;
 
@@ -12,6 +13,7 @@ namespace Tumbler.Model
 
 		private Process _processObject;
 		private readonly Action<string> _reportProcessStatus;
+		private bool _isCommandLineValid;
 		
 		#endregion
 
@@ -24,9 +26,9 @@ namespace Tumbler.Model
 		public string CommandLine { get; }
 		public int StartTime { get; }
 		public int EndTime { get; }
-		
-		public string ExePath => GetExePath();
-		public string Arguments => GetArguments();
+
+		public string ExePath { private set; get; }
+		public string Arguments { private set; get; } = string.Empty;
 
 		public bool IsStartedSuccessfully { private set; get; }
 		public bool IsStoppedSuccessfully { private set; get; }
@@ -46,7 +48,8 @@ namespace Tumbler.Model
 
 		public WatchedProcess(string commandLine, int startTime, int endTime, Action<string> reportProcessStatus, ProcessPriorityClass priority = ProcessPriorityClass.High)
 		{
-			CommandLine = commandLine;
+			CommandLine = commandLine.Trim();
+			SplitCommandLine();
 			StartTime = startTime;
 			EndTime = endTime;
 			_reportProcessStatus = reportProcessStatus;
@@ -59,6 +62,12 @@ namespace Tumbler.Model
 
 		public void Start()
 		{
+			if (!_isCommandLineValid)
+			{
+				_reportProcessStatus($"Invalid command line for process start : {CommandLine}");
+				return;
+			}
+
 			ProcessStartInfo startInfo = new ProcessStartInfo(ExePath, Arguments);
 			try
 			{
@@ -123,14 +132,25 @@ namespace Tumbler.Model
 		
 		#region Service methods
 
-		private string GetExePath()
+		private void SplitCommandLine()
 		{
-			throw new NotImplementedException();
-		}
-
-		private string GetArguments()
-		{
-			throw new NotImplementedException();
+			var firstQuoteIndex = CommandLine.IndexOf("'", StringComparison.Ordinal);
+			var lastQuoteIndex = CommandLine.LastIndexOf("'", StringComparison.Ordinal);
+			if (CommandLine.Contains("'")
+				&& firstQuoteIndex != lastQuoteIndex)
+			{
+				ExePath = CommandLine.Substring(firstQuoteIndex, lastQuoteIndex - firstQuoteIndex + 1).Trim('\'');
+				Arguments = CommandLine.Remove(firstQuoteIndex, lastQuoteIndex - firstQuoteIndex + 1);
+			}
+			else
+			{
+				var splitArgs = CommandLine.Split(new []{" "}, StringSplitOptions.RemoveEmptyEntries);
+				ExePath = splitArgs.First();
+				if (splitArgs.Length > 1)
+				{
+					Arguments = string.Join(" ", splitArgs.Skip(1));
+				}
+			}
 		}
 		
 		#endregion

@@ -117,7 +117,7 @@ namespace Tumbler
 		{
 			if (string.IsNullOrEmpty(argv))
 			{
-				Console.WriteLine("Invalid number of arguments passed. "+ UsageExample);
+				Console.WriteLine("Invalid number of arguments passed. ");
 			}
 			else
 			{
