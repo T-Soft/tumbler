@@ -7,4 +7,13 @@
 		<Deterministic>False</Deterministic>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <None Update="tumblerfile.json">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
+	  <None Update="tumblerfile.xml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>

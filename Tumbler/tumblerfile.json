@@ -1,4 +1,5 @@
 ﻿{
+	"watch_time": 10,
 	"processes": [
 		{
 			"name": "first program",

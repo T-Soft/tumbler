@@ -149,7 +149,7 @@ namespace Tumbler.Model
 					_isCommandLineValid = false;
 				}
 
-				Arguments = CommandLine.Remove(firstQuoteIndex, lastQuoteIndex - firstQuoteIndex + 1);
+				Arguments = CommandLine.Remove(firstQuoteIndex, lastQuoteIndex - firstQuoteIndex + 1).Trim();
 			}
 			else
 			{
@@ -157,7 +157,7 @@ namespace Tumbler.Model
 				ExePath = splitArgs.First();
 				if (splitArgs.Length > 1)
 				{
-					Arguments = string.Join(" ", splitArgs.Skip(1));
+					Arguments = string.Join(" ", splitArgs.Skip(1)).Trim();
 				}
 			}
 		}
