@@ -8,7 +8,7 @@ using System.Threading;
 using Tumbler.Helpers;
 using Tumbler.ConfigurationParsing;
 
-[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("2.0.*")]
 namespace Tumbler
 {
 	class Program
@@ -26,7 +26,7 @@ namespace Tumbler
 		#endregion
 
 		private static int _watchInterval = 60;
-		private const string LOG_FILE_NAME = "upper.log";
+		private const string LOG_FILE_NAME = "tumbler.log";
 
 		private static void Main(string[] args)
 		{

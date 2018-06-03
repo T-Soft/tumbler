@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Tumbler.ConfigurationParsing;
 using Tumbler.Helpers;
 
@@ -24,8 +25,8 @@ namespace Tumbler.Model
 		
 		public ProcessPriorityClass ProcessPriority { get; }
 		public string CommandLine { get; }
-		public int StartTime { get; }
-		public int EndTime { get; }
+		public int StartTimeSeconds { get; }	// in seconds
+		public int EndTimeSeconds { get; }		// in seconds
 
 		public string ExePath { private set; get; }
 		public string Arguments { private set; get; } = string.Empty;
@@ -33,7 +34,7 @@ namespace Tumbler.Model
 		public bool IsStartedSuccessfully { private set; get; }
 		public bool IsStoppedSuccessfully { private set; get; }
 
-		public bool IsBeingWatched => EndTime != -1;
+		public bool IsBeingWatched => EndTimeSeconds != -1;
 		public bool IsAlive =>
 			_processObject != null
 			&& (
@@ -46,12 +47,12 @@ namespace Tumbler.Model
 
 		#region Ctor
 
-		public WatchedProcess(string commandLine, int startTime, int endTime, Action<string> reportProcessStatus, ProcessPriorityClass priority = ProcessPriorityClass.High)
+		public WatchedProcess(string commandLine, int startTimeSeconds, int endTimeSeconds, Action<string> reportProcessStatus, ProcessPriorityClass priority = ProcessPriorityClass.High)
 		{
 			CommandLine = commandLine.Trim();
 			SplitCommandLine();
-			StartTime = startTime;
-			EndTime = endTime;
+			StartTimeSeconds = startTimeSeconds;
+			EndTimeSeconds = endTimeSeconds;
 			_reportProcessStatus = reportProcessStatus;
 			ProcessPriority = priority;
 		}
@@ -100,6 +101,8 @@ namespace Tumbler.Model
 			{
 				_reportProcessStatus($"An error happened during process activation : {Environment.NewLine}{ex}");
 			}
+
+			Thread.Sleep(StartTimeSeconds * 1000);
 		}
 
 		public void TryStop()
@@ -126,6 +129,7 @@ namespace Tumbler.Model
 
 			ProcessId = -1;
 			ProcessName = string.Empty;
+			Thread.Sleep(EndTimeSeconds * 1000);
 		}
 
 		#endregion
