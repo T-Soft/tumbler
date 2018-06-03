@@ -11,8 +11,8 @@ namespace Tumbler.Helpers
 		{
 			try
 			{
-				Process.GetProcessById(processId);
-				return true;
+				var process = Process.GetProcessById(processId);
+				return !process.HasExited;
 			}
 			catch (ArgumentException)
 			{

@@ -31,7 +31,7 @@ namespace Tumbler.ConfigurationParsing
 				return FileParser.Parse(args[0], _reportFileError, _reportProcessStatus, out watchInterval);
 			}
 			
-			if (args.Length > 4 && (args.Length-1) % 3 == 0)
+			if (args.Length >= 4 && (args.Length-1) % 3 == 0)
 			{
 				if (!int.TryParse(args[0], out watchInterval))
 				{

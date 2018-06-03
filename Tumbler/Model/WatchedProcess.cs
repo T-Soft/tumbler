@@ -35,13 +35,7 @@ namespace Tumbler.Model
 		public bool IsStoppedSuccessfully { private set; get; }
 
 		public bool IsBeingWatched => EndTimeSeconds != -1;
-		public bool IsAlive =>
-			_processObject != null
-			&& (
-				!_processObject.HasExited
-				||
-				ProcessHelper.IsProcessAlive(ProcessId)
-			);
+		public bool IsAlive => ProcessHelper.IsProcessAlive(ProcessId);
 
 		#endregion
 
@@ -124,7 +118,8 @@ namespace Tumbler.Model
 			}
 			catch (Exception)
 			{
-				_reportProcessStatus($"\tFailed to stop process '{ProcessName}' PID={ProcessId}");
+				// ignore ?
+				//_reportProcessStatus($"\tFailed to stop process '{ProcessName}' PID={ProcessId}");
 			}
 
 			ProcessId = -1;
@@ -144,12 +139,15 @@ namespace Tumbler.Model
 				&& firstQuoteIndex != lastQuoteIndex)
 			{
 				ExePath = CommandLine.Substring(firstQuoteIndex, lastQuoteIndex - firstQuoteIndex + 1).Trim('\'');
+				Arguments = CommandLine.Remove(firstQuoteIndex, lastQuoteIndex - firstQuoteIndex + 1).Trim();
 				if (ExePath.Contains("'"))
 				{
 					_isCommandLineValid = false;
 				}
-
-				Arguments = CommandLine.Remove(firstQuoteIndex, lastQuoteIndex - firstQuoteIndex + 1).Trim();
+				else
+				{
+					_isCommandLineValid = true;
+				}
 			}
 			else
 			{
@@ -159,6 +157,8 @@ namespace Tumbler.Model
 				{
 					Arguments = string.Join(" ", splitArgs.Skip(1)).Trim();
 				}
+
+				_isCommandLineValid = true;
 			}
 		}
 		

@@ -77,25 +77,23 @@ namespace Tumbler
 					foreach (var deadProcess in deadProcesses)
 					{
 						WriteLog($"{DateTime.Now.ToDiagnosticString()} No process PID={deadProcess.ProcessId}. Stopping remaining list...");
-
-						watchedProcesses.ForEach(p => p.TryStop());
-
-						Console.WriteLine(
-							$"{Environment.NewLine}{DateTime.Now.ToDiagnosticString()} Remaining processes stopped. Restarting...");
-
-						watchedProcesses.ForEach(p => p.Start());
-
-						Console.WriteLine(
-							$"{Environment.NewLine}{DateTime.Now.ToDiagnosticString()} Process list restart complete. {Environment.NewLine}");
-						Console.WriteLine(
-							$"To keep processes and exit press 'CTRL+C';{Environment.NewLine}"
-							+ $"To close all processes and exit press 'ESC'.{Environment.NewLine}");
-
-						break;
 					}
+
+					watchedProcesses.ForEach(p => p.TryStop());
+
+					Console.WriteLine(
+						$"{Environment.NewLine}{DateTime.Now.ToDiagnosticString()} Remaining processes stopped. Restarting...");
+
+					watchedProcesses.ForEach(p => p.Start());
+					
+					Console.WriteLine(
+						$"{Environment.NewLine}{DateTime.Now.ToDiagnosticString()} Process list restart complete. {Environment.NewLine}");
+					Console.WriteLine(
+						$"To keep processes and exit press 'CTRL+C';{Environment.NewLine}"
+						+ $"To close all processes and exit press 'ESC'.{Environment.NewLine}");
 				}
 
-				Thread.Sleep(_watchInterval);
+				Thread.Sleep(_watchInterval*1000);
 			}
 			while (c.Key != ConsoleKey.Escape);
 

@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?> 
-<ProcessList watch_time="10">
-	<Process name="test1" priorirty="high" command="'C:\temp\test edit\testProcess.exe' -n" start_time="10" end_time="20"/>
-	<Process name="test2" priorirty="low" command="c:\testProcessPath\1\test.exe -k -b" start_time="10" end_time="20"/>
+<ProcessList watch_time="3">
+	<Process name="test1" priorirty="high" command="'c:\Program Files\MKVToolNix\mkvtoolnix-gui.exe' -noupdate" start_time="3" end_time="3"/>
+	<Process name="test2" priorirty="high" command="'c:\Program Files\WinRAR\WinRAR.exe' -noupdate" start_time="3" end_time="3"/>
+	<!--<Process name="test2" priorirty="low" command="c:\testProcessPath\1\test.exe -k -b" start_time="10" end_time="20"/>-->
 </ProcessList>
 
