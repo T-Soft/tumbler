@@ -140,6 +140,11 @@ namespace Tumbler.Model
 				&& firstQuoteIndex != lastQuoteIndex)
 			{
 				ExePath = CommandLine.Substring(firstQuoteIndex, lastQuoteIndex - firstQuoteIndex + 1).Trim('\'');
+				if (ExePath.Contains("'"))
+				{
+					_isCommandLineValid = false;
+				}
+
 				Arguments = CommandLine.Remove(firstQuoteIndex, lastQuoteIndex - firstQuoteIndex + 1);
 			}
 			else
