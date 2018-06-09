@@ -18,7 +18,7 @@ build:
   verbosity: minimal
 
 after_build:
-- cmd: "7z a myapp.zip %APPVEYOR_BUILD_FOLDER%\\Tumbler\\bin\\Release\\net461\\Tumbler.exe \n7z a myapp.zip %APPVEYOR_BUILD_FOLDER%\\Tumbler\\bin\\Release\\net461\\tumblerfile.xml"
+- cmd: "7z a tumbler.zip %APPVEYOR_BUILD_FOLDER%\\Tumbler\\bin\\Release\\net461\\Tumbler.exe \n7z a tumbler.zip %APPVEYOR_BUILD_FOLDER%\\Tumbler\\bin\\Release\\net461\\tumblerfile.xml"
 
 test: off
 
