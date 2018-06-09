@@ -16,14 +16,18 @@ before_build:
 build:
   verbosity: minimal
 
+after_build:
+- ps: "7z a myapp.zip %APPVEYOR_BUILD_FOLDER%\\Tumbler\\bin\\Release\\net461\\Tumbler.exe \n7z a myapp.zip %APPVEYOR_BUILD_FOLDER%\\Tumbler\\bin\\Release\\net461\\tumblerfile.xml"
+
 test: off
 
 artifacts:
-- path: /.*\.exe/
+- path: tumbler.zip
+  name: app_archive
 
 deploy:
 - provider: GitHub
   release: v$(appveyor_build_version)
   auth_token:
     secure: xcRlHNsFt4uvxrweMuH4c1cozx0B2jxT0/UDxJFKYFAqgBWVtVV7D5A7P9aNH1pJ
-  artifact: /.*\.exe/
+  artifact: tumbler.zip
