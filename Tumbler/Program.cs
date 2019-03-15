@@ -25,7 +25,7 @@ namespace Tumbler
 
 		#endregion
 
-		private static int _watchInterval = 60;
+		private static int _watchInterval = 60; // seconds
 		private const string LOG_FILE_NAME = "tumbler.log";
 
 		private static void Main(string[] args)
@@ -93,7 +93,10 @@ namespace Tumbler
 						+ $"To close all processes and exit press 'ESC'.{Environment.NewLine}");
 				}
 
-				Thread.Sleep(_watchInterval*1000);
+				// try restart watched processes
+				watchedProcesses.ForEach(p=>p.TryRestart());
+
+				Thread.Sleep(_watchInterval * 1000);
 			}
 			while (c.Key != ConsoleKey.Escape);
 

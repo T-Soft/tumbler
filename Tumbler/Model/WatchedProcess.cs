@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace Tumbler.Model
 		private Process _processObject;
 		private readonly Action<string> _reportProcessStatus;
 		private bool _isCommandLineValid;
+		private DateTime? _lastRestartDateTime;
 		
 		#endregion
 
@@ -26,7 +28,15 @@ namespace Tumbler.Model
 		public ProcessPriorityClass ProcessPriority { get; }
 		public string CommandLine { get; }
 		public int StartTimeSeconds { get; }	// in seconds
-		public int EndTimeSeconds { get; }		// in seconds
+		public int EndTimeSeconds { get; }      // in seconds
+
+		/// <summary>
+		/// Gets or sets the process restart times in current timezone.
+		/// </summary>
+		/// <value>
+		/// The restart times.
+		/// </value>
+		public IList<DateTime> RestartTimes { get; }
 
 		public string ExePath { private set; get; }
 		public string Arguments { private set; get; } = string.Empty;
@@ -41,21 +51,50 @@ namespace Tumbler.Model
 
 		#region Ctor
 
-		public WatchedProcess(string commandLine, int startTimeSeconds, int endTimeSeconds, Action<string> reportProcessStatus, ProcessPriorityClass priority = ProcessPriorityClass.High)
+		public WatchedProcess(
+			string processName,
+			string commandLine,
+			int startTimeSeconds,
+			int endTimeSeconds,
+			Action<string> reportProcessStatus,
+			IList<DateTime> restartTimes = null,
+			ProcessPriorityClass priority = ProcessPriorityClass.High)
 		{
+			ProcessName = processName;
 			CommandLine = commandLine.Trim();
 			SplitCommandLine();
 			StartTimeSeconds = startTimeSeconds;
 			EndTimeSeconds = endTimeSeconds;
 			_reportProcessStatus = reportProcessStatus;
 			ProcessPriority = priority;
+			RestartTimes = restartTimes ?? new List<DateTime>();
 		}
 
 		#endregion
 
-		#region Start / stop methods
+		#region Start / stop / restart methods
 
-		public void Start()
+		public void TryRestart()
+		{
+			DateTime now = DateTime.Now;
+
+			if (!RestartTimes.Any()
+				|| (/*now.Month == _lastRestartDateTime.Month &&*/ now.Day == _lastRestartDateTime?.Day))
+			{
+				return; // no restart times defined or there had already been restart today
+			}
+
+			var restartTime = RestartTimes.First(); // TODO: support multiple restart times
+			if (now.IsTimePast(restartTime))
+			{
+				_reportProcessStatus($"-+ Restarting process '{ProcessName}' PID={ProcessId}.");
+				TryStop(isForced: true);
+				Start(isForced: true);
+				_lastRestartDateTime = DateTime.Now;
+			}
+		}
+
+		public void Start(bool isForced = false)
 		{
 			if (!_isCommandLineValid)
 			{
@@ -80,7 +119,7 @@ namespace Tumbler.Model
 					ProcessName = startedProcess.ProcessName;
 					ProcessId = startedProcess.Id;
 					IsStartedSuccessfully = true;
-					_reportProcessStatus($"Started process '{ProcessName}' PID={ProcessId}");
+					_reportProcessStatus($"++ Started process '{ProcessName}' PID={ProcessId}");
 				}
 			}
 			catch (InvalidOperationException)
@@ -96,10 +135,13 @@ namespace Tumbler.Model
 				_reportProcessStatus($"An error happened during process activation : {Environment.NewLine}{ex}");
 			}
 
-			Thread.Sleep(StartTimeSeconds * 1000);
+			if (!isForced)
+			{
+				Thread.Sleep(StartTimeSeconds * 1000);
+			}
 		}
 
-		public void TryStop()
+		public void TryStop(bool isForced = false)
 		{
 			try
 			{
@@ -113,18 +155,21 @@ namespace Tumbler.Model
 					_processObject.Close();
 				}
 
-				_reportProcessStatus($"\tStopped process '{ProcessName}' PID={ProcessId}");
+				_reportProcessStatus($"-- Stopped process '{ProcessName}' PID={ProcessId}");
 				IsStoppedSuccessfully = true;
 			}
 			catch (Exception)
 			{
-				// ignore ?
-				//_reportProcessStatus($"\tFailed to stop process '{ProcessName}' PID={ProcessId}");
+				// ignore
 			}
 
 			ProcessId = -1;
 			ProcessName = string.Empty;
-			Thread.Sleep(EndTimeSeconds * 1000);
+
+			if (!isForced)
+			{
+				Thread.Sleep(EndTimeSeconds * 1000);
+			}
 		}
 
 		#endregion

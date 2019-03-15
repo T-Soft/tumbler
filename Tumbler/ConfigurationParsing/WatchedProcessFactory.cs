@@ -61,7 +61,7 @@ namespace Tumbler.ConfigurationParsing
 						return null;
 					}
 
-					ret.Add(new WatchedProcess(processCommandLine, processStartTime, processEndTime, _reportProcessStatus));
+					ret.Add(new WatchedProcess("UNKNOWN", processCommandLine, processStartTime, processEndTime, _reportProcessStatus));
 				}
 
 				return ret;

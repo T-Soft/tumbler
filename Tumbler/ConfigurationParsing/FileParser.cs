@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -37,11 +38,36 @@ namespace Tumbler.ConfigurationParsing
 			var watchedProcesses = config.Root.Descendants("Process").Select(proc =>
 			{
 				var name = proc.Attribute("name")?.Value;
+
 				var priority = proc.Attribute("priorirty")?.Value;
+				Enum.TryParse(priority, true, out ProcessPriorityClass processPriority);
+				
 				var command = proc.Attribute("command")?.Value;
 				var startTime = int.Parse(proc.Attribute("start_time")?.Value);
 				var endTime = int.Parse(proc.Attribute("end_time")?.Value);
-				return new WatchedProcess(command, startTime, endTime, reportProcessStatus);
+
+				var restartTimes = new List<DateTime>();
+				var restartTimeAttributeValue = proc.Attribute("restart_time")?.Value;
+				if (!string.IsNullOrEmpty(restartTimeAttributeValue))
+				{
+					if(DateTime.TryParse(restartTimeAttributeValue, out DateTime restartTime))
+					{
+						restartTimes.Add(restartTime); // TODO: support multiple restart times
+					}
+					else
+					{
+						reportFileError($"Unable to parse restart_time attribute value {restartTimeAttributeValue}");
+					}
+				}
+
+				return new WatchedProcess(
+					name,
+					command,
+					startTime,
+					endTime,
+					reportProcessStatus,
+					restartTimes,
+					processPriority);
 			});
 			
 			return watchedProcesses.ToList();
