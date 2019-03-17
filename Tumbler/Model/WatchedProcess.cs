@@ -79,7 +79,7 @@ namespace Tumbler.Model
 			DateTime now = DateTime.Now;
 
 			if (!RestartTimes.Any()
-				|| (/*now.Month == _lastRestartDateTime.Month &&*/ now.Day == _lastRestartDateTime?.Day))
+				|| (now.Day == _lastRestartDateTime?.Day))
 			{
 				return; // no restart times defined or there had already been restart today
 			}

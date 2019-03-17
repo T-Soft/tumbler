@@ -50,7 +50,8 @@ namespace Tumbler
 				return;
 			}
 
-			WriteLog($"{Environment.NewLine}{DateTime.Now.ToDiagnosticString()} First start...");
+			WriteLog(Environment.NewLine);
+			WriteLog($"First start...");
 			
 			// start all processes
 			watchedProcesses.ForEach(p=>p.Start());
@@ -76,7 +77,7 @@ namespace Tumbler
 				{
 					foreach (var deadProcess in deadProcesses)
 					{
-						WriteLog($"{DateTime.Now.ToDiagnosticString()} No process PID={deadProcess.ProcessId}. Stopping remaining list...");
+						WriteLog($"No process PID={deadProcess.ProcessId}. Stopping remaining list...");
 					}
 
 					watchedProcesses.ForEach(p => p.TryStop());
@@ -100,18 +101,24 @@ namespace Tumbler
 			}
 			while (c.Key != ConsoleKey.Escape);
 
-			WriteLog($"{DateTime.Now.ToDiagnosticString()} Exit sequence. Stopping all processes...");
+			WriteLog($"Exit sequence. Stopping all processes...");
 			// stop all processes
 			watchedProcesses.ForEach(p=>p.TryStop());
-			WriteLog($"{Environment.NewLine}{DateTime.Now.ToDiagnosticString()} Processes stopped. Exiting...");
+			WriteLog($"Processes stopped. Exiting...");
 		}
 		
 		#region Console && Log writing methods
 
 		static void WriteLog(string data)
 		{
-			Console.WriteLine(data);
-			File.AppendAllText(LOG_FILE_NAME, data + Environment.NewLine);
+			string dataToWrite = $"{DateTime.Now.ToDiagnosticString()} " + data + Environment.NewLine;
+			if (data == Environment.NewLine)
+			{
+				dataToWrite = Environment.NewLine;
+			}
+			
+			Console.WriteLine(dataToWrite.TrimEnd());
+			File.AppendAllText(LOG_FILE_NAME, dataToWrite);
 		}
 
 		private static void ArgError(string argv)
