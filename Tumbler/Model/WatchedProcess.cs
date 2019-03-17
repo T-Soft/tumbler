@@ -16,12 +16,12 @@ namespace Tumbler.Model
 		private Process _processObject;
 		private readonly Action<string> _reportProcessStatus;
 		private bool _isCommandLineValid;
-		private DateTime? _lastRestartDateTime;
+		private DateTime _lastRestartDateTime;
 		
 		#endregion
 
 		#region Props
-
+		
 		public string ProcessName { private set; get; }
 		public int ProcessId { private set; get; }
 		
@@ -79,9 +79,9 @@ namespace Tumbler.Model
 			DateTime now = DateTime.Now;
 
 			if (!RestartTimes.Any()
-				|| (now.Day == _lastRestartDateTime?.Day))
+				|| (now.Day == _lastRestartDateTime.Day))
 			{
-				return; // no restart times defined or there had already been restart today
+				return; // no restart times defined or there had already been start/restart today
 			}
 
 			var restartTime = RestartTimes.First(); // TODO: support multiple restart times
@@ -120,6 +120,7 @@ namespace Tumbler.Model
 					ProcessId = startedProcess.Id;
 					IsStartedSuccessfully = true;
 					_reportProcessStatus($"++ Started process '{ProcessName}' PID={ProcessId}");
+					_lastRestartDateTime = DateTime.Now;
 				}
 			}
 			catch (InvalidOperationException)
